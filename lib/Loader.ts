@@ -184,8 +184,8 @@ export class Loader {
     }];
 
 
-    // console.log(url);
-    const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' } }
+    console.log(url);
+    const options = {};// headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' } } //todo: change useragent
     const response = await axios.get(url, options);
     // console.log(response);
     const json = await parseStringPromise(response.data) as Entsoe;

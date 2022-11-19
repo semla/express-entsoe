@@ -7,3 +7,5 @@ todo.txt
 .env-test
 .env-cache
 tmp
+ui-debug.log
+firebase-debug.log
