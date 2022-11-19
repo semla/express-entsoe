@@ -5,9 +5,9 @@ import { CreateSwagger } from './Swagger';
 import { gzip } from 'zlib';
 import { Datevalidator } from './Datevalidator';
 import { ChartGroup } from './interfaces/charts';
-import { EntsoeCache } from './Cache';
+//import { EntsoeCache } from './Cache';
 import { EntsoeConfig } from './interfaces/entsoeCache';
-import { ConfigurationOptions, config } from 'aws-sdk';
+//import { ConfigurationOptions, config } from 'aws-sdk';
 import axios from 'axios';
 
 
@@ -27,14 +27,14 @@ export class Entsoe {
     if (entsoeConfig.entsoeDomain) {
       entsoeDomain = entsoeConfig.entsoeDomain;
     }
-    const awsConfig: ConfigurationOptions = {
-      secretAccessKey: entsoeConfig.awsSecretAccessKey,
-      accessKeyId: entsoeConfig.awsAccessKeyId,
-      region: 'eu-central-1'
-    }
-    delete entsoeConfig.awsAccessKeyId;
-    delete entsoeConfig.awsSecretAccessKey;
-    config.update(awsConfig);
+    // const awsConfig: ConfigurationOptions = {
+    //   secretAccessKey: entsoeConfig.awsSecretAccessKey,
+    //   accessKeyId: entsoeConfig.awsAccessKeyId,
+    //   region: 'eu-central-1'
+    // }
+    // delete entsoeConfig.awsAccessKeyId;
+    // delete entsoeConfig.awsSecretAccessKey;
+    // config.update(awsConfig);
 
     const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);
     const router = express.Router();
@@ -42,50 +42,50 @@ export class Entsoe {
 
 
     router.use(async (req, res, next) => {
-      if (req.headers?.refresh === 'true') {
+      //if (req.headers?.refresh === 'true') {
         next()
-      } else {
-        const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        try {
-          let ETag = '';
-          const ETagParts = req.headers['if-none-match']?.split('/');
-          if (ETagParts?.[1]) {
-            ETag = ETagParts[1];
-          }
-          // console.log(`>${ETag}<`)
-          const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
-          if (!stream) {
-            res.set('ETag', 'W/' + ETag);
-            res.set('Last-Modified', (new Date()).toUTCString());
-            return res.sendStatus(304);
-          } else {
-            res.set('Cache-Control', `public, max-age=${maxAge}`);
-            res.set('content-type', 'application/json');
-            res.set('content-encoding', 'gzip');
-            if (stream.Body) {
-              res.set('ETag', 'W/' + stream.ETag);
-              res.set('Last-Modified', (new Date()).toUTCString());
-              res.end(stream.Body, 'binary')
-            } else {
-              res.set('ETag', 'W/' + stream.ETag);
-              res.set('Last-Modified', (new Date()).toUTCString());
-              stream.file.pipe(res);
-            }
-          }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-          if (e.code !== 'NotModified') {
-            //console.log('e1', e)
-            next();
-          } else {
-            const ETag = req.headers['if-none-match'];
-            res.set('ETag', ETag + '');
-            // res.set('Last-Modified', (new Date()).toUTCString());
-            res.set('Cache-Control', `public, max-age=${maxAge}`);
-            res.sendStatus(304)
-          }
-        }
-      }
+      //} else {
+    //     const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    //     try {
+    //       let ETag = '';
+    //       const ETagParts = req.headers['if-none-match']?.split('/');
+    //       if (ETagParts?.[1]) {
+    //         ETag = ETagParts[1];
+    //       }
+    //       // console.log(`>${ETag}<`)
+    //       const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
+    //       if (!stream) {
+    //         res.set('ETag', 'W/' + ETag);
+    //         res.set('Last-Modified', (new Date()).toUTCString());
+    //         return res.sendStatus(304);
+    //       } else {
+    //         res.set('Cache-Control', `public, max-age=${maxAge}`);
+    //         res.set('content-type', 'application/json');
+    //         res.set('content-encoding', 'gzip');
+    //         if (stream.Body) {
+    //           res.set('ETag', 'W/' + stream.ETag);
+    //           res.set('Last-Modified', (new Date()).toUTCString());
+    //           res.end(stream.Body, 'binary')
+    //         } else {
+    //           res.set('ETag', 'W/' + stream.ETag);
+    //           res.set('Last-Modified', (new Date()).toUTCString());
+    //           stream.file.pipe(res);
+    //         }
+    //       }
+    //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     } catch (e: any) {
+    //       if (e.code !== 'NotModified') {
+    //         //console.log('e1', e)
+    //         next();
+    //       } else {
+    //         const ETag = req.headers['if-none-match'];
+    //         res.set('ETag', ETag + '');
+    //         // res.set('Last-Modified', (new Date()).toUTCString());
+    //         res.set('Cache-Control', `public, max-age=${maxAge}`);
+    //         res.sendStatus(304)
+    //       }
+    //     }
+    //   }
     });
 
 
@@ -231,11 +231,11 @@ export class Entsoe {
         res.set('content-encoding', 'gzip');
         res.set('Last-Modified', (new Date()).toUTCString());
         res.set('Cache-Control', `public, max-age=${config.maxAge}`);
-        const ETag = await EntsoeCache.write(result, req.url, config);
-        if (ETag) {
-          res.set('Last-Modified', (new Date()).toUTCString());
-          res.set('ETag', 'W/' + ETag);  //aws ETag
-        }
+        // const ETag = await EntsoeCache.write(result, req.url, config);
+        // if (ETag) {
+        //   res.set('Last-Modified', (new Date()).toUTCString());
+        //   res.set('ETag', 'W/' + ETag);  //aws ETag
+        // }
         res.send(result);
       } else {
         res.send(data);
