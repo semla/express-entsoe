@@ -13,7 +13,7 @@
     "deploy": "firebase deploy --only functions"
   },
   "engines": {
-    "node": "16"
+    "node": "14"
   },
   "author": "",
   "license": "ISC",
