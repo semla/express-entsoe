@@ -1,4 +1,9 @@
-# Express-entsoe
+# Adaption of the Express-entsoe to Firebase
+
+Fork of https://github.com/robotnic/express-entsoe which seems designed to run on aws.
+
+
+## Express-entsoe
 
 Easy to use json api for entso-e.
 
