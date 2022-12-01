@@ -4,7 +4,7 @@ import { Chart, ChartGroup, Point, Source } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config, ConfigType } from "./Config";
 import { Duration, Period } from 'js-joda';
-import { addSeconds, differenceInDays, max, parse } from 'date-fns';
+import { addSeconds, differenceInDays, parse } from 'date-fns';// max,  to avoid compiler errors, not used
 import { formatInTimeZone } from 'date-fns-tz';
 import { InputError, UpstreamError } from "./Errors";
 import { Country } from "./interfaces/countries";
