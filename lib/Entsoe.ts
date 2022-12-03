@@ -16,14 +16,14 @@ export class Entsoe {
 
     let entsoeDomain = 'https://transparency.entsoe.eu';
     let basePath = '/entsoe';
-    let maxAge = 0;
+    entsoeConfig.maxAge = 60*60;
 
     if (entsoeConfig.basePath) {
       basePath = entsoeConfig.basePath;
     }
-    if (entsoeConfig.maxAge) {
-      maxAge = entsoeConfig.maxAge;
-    }
+    // if (entsoeConfig.maxAge) {
+    //   maxAge = entsoeConfig.maxAge;
+    // }
     if (entsoeConfig.entsoeDomain) {
       entsoeDomain = entsoeConfig.entsoeDomain;
     }
@@ -142,7 +142,6 @@ export class Entsoe {
       }
     })
 
-
     router.get(`${basePath}/:country/prices`, async (req, res) => {
       const country = req.params.country;
       try {
@@ -230,7 +229,14 @@ export class Entsoe {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
         res.set('Last-Modified', (new Date()).toUTCString());
-        res.set('Cache-Control', `public, max-age=${config.maxAge}`);
+        // set the cache to longer if it is data that will not be updated, like data further back than yesterday
+        if (endOfPeriodIsFurtherBackThanYesterday(data)){
+          res.set('Cache-Control', `public, max-age=${60*60*24*10}, s-maxage=${60*60*24*30}`);
+        } else {
+          res.set('Cache-Control', `public, max-age=${config.maxAge}`);
+        }
+
+        // todo: use etag even if no cache file?
         // const ETag = await EntsoeCache.write(result, req.url, config);
         // if (ETag) {
         //   res.set('Last-Modified', (new Date()).toUTCString());
@@ -238,7 +244,7 @@ export class Entsoe {
         // }
         res.send(result);
       } else {
-        res.send(data);
+        res.send(data); // all browsers support gzip, I guess that is why no headers are set here
       }
       //EntsoeCache.write(result, req.url, config);
       /*
@@ -251,8 +257,12 @@ export class Entsoe {
       })
       */
     });
-  }
 
+     function endOfPeriodIsFurtherBackThanYesterday(data:ChartGroup):boolean {
+       const endDate = new Date(data.dataInterval?.end as string);
+       return (new Date().getTime() - endDate.getTime() > 24*60*60*1000)
+     }
+  }
 
   private static errorHandler(res: express.Response, e: Error): express.Response {
     if (e instanceof InputError) {
